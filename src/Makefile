@@ -101,8 +101,10 @@ build: all
 .PHONY: all
 all: $(TARGET).out
 
+ #link and use code size utility
 $(TARGET).out:$(OBJS)
 	$(CC) -o $@ $^ $(CFFLAGS) $(LDFLAGS) -D$(PLATFORM)
+	$(CC)-nm -S --defined -s $@
 
  #so we could use the command "make clean" to clean all that files
 .PHONY: clean
