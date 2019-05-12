@@ -9,14 +9,15 @@
 #*****************************************************************************
 
 # Add your Source files to this variable
-MSP_SOURCES = interrupts_msp432p401r_gcc.c \
-	      main.c                       \
-	      memory.c                     \
-	      startup_msp432p401r_gcc.c    \
-	      system_msp432p401r.c   
+SOURCES = main.c     \
+	  memory.c
 
-HOST_SOURCES = main.c     \
-	       memory.c
+ifeq ($(PLATFORM), MSP432)
+SOURCES += interrupts_msp432p401r_gcc.c  \
+           startup_msp432p401r_gcc.c    \
+           system_msp432p401r.c
+endif
+
 
 # Add your include paths to this variable
 INCLUDES = -I ../include/CMSIS        \

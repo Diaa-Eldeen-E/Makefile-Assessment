@@ -27,7 +27,7 @@
 # mfpu=fpv4-sp-d16 and it's specs is nosys.specs
 #
 # Platform Overrides:
-# @The HOST machine
+# @The HOST machine is the defualt platform
 # @The HOST embedded system MSP432
 #
 #------------------------------------------------------------------------------
@@ -36,62 +36,60 @@ include sources.mk
 LINKER_FILE = ../msp432p401r.lds
  #this is the target output name
 TARGET=c1m2
+ #defualt PLATFORM
+PLATFORM=HOST
+ #common flags in both platforms
+COM_FLAGS= -Wall -Werror -std=c99 -g -O0 $(INCLUDES) -D$(PLATFORM)
+ #rename every .c to .o file and store it in the variable OBJS
+OBJS=$(SOURCES:.c=.o)
+ #preprocessor flags to generate .d dependency files
+CPPFLAGS= -MMD -MP
+ #Architectures Specific Flags
+CPU=cortex-m4
+ARCH=thumb
+ARCH_=armv7e-m
+FLOAT_ABI=hard
+FPU=fpv4-sp-d16
+SPECS=nosys.specs
 
  #if PLATFORM=MSP432
 ifeq ($(PLATFORM) ,MSP432)
-	 #Architectures Specific Flags
-	CPU=cortex-m4
-	ARCH=thumb
-	ARCH_=armv7e-m
-	FLOAT_ABI=hard
-	FPU=fpv4-sp-d16
-	SPECS=nosys.specs
-	 #Compiler Flags and Defines
-	CC = arm-none-eabi-gcc
-	LD = arm-none-eabi-ld
-	 # @LDFLAGS generate map file and use linker file
-	LDFLAGS = -Wl,-Map=$(TARGET).map -T $(LINKER_FILE)
-	 # @CFFLAGS add include (files.h) directory and specifie the compiler flags
-	CFFLAGS = -mcpu=$(CPU) -m$(ARCH)  $(INCLUDES)               \
-	           --specs=$(SPECS) -Wall -Werror -std=c99 -g -O0   \
-		   -mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI) -march=$(ARCH_) 
-
- #rename every .c to .o file and stores it the variable OBJS
-OBJS=$(MSP_SOURCES:.c=.o)
+ #Compiler Flags and Defines
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
+ # @LDFLAGS generate map file and use linker file
+LDFLAGS = -T $(LINKER_FILE) -Wl,-Map=$(TARGET).map
+ # @CFLAGS add include (files.h) directory and specifie the compiler flags
+CFLAGS = $(COM_FLAGS) -mcpu=$(CPU) -m$(ARCH) --specs=$(SPECS) \
+	-mfpu=$(FPU) -mfloat-abi=$(FLOAT_ABI) -march=$(ARCH_) 
 
  #if PLATFORM=HOST
 else
-	 #Compiler Flags and Defines
-	CC = gcc
-	 # @LDFLAGS generates map file 
-	LDFLAGS = -Wl,-Map=$(TARGET).map 
-	 # @CFFLAGS add include (files.h) directory and specify the compiler flags
-	CFFLAGS = -Wall -Werror -std=c99 -g -O0 $(INCLUDES)
-
- #rename every .c to .o file and stores it the variable OBJS
-OBJS=$(HOST_SOURCES:.c=.o)
+ #Compiler Flags and Defines
+CC = gcc
+ # @LDFLAGS generates map file 
+LDFLAGS = -Wl,-Map=$(TARGET).map 
+ # @CFLAGS add include (files.h) directory and specify the compiler flags
+CFLAGS = $(COM_FLAGS)
 
 endif
-
- #preprocessor flags to generate .d dependency files
-CPPFLAGS= -MMD -MP
 
  # $< dependencies , $@ target to be built
  #  %target to be built : % it's dependencies
 %.i : %.c
  #rule to build and it must start with a tab
-	$(CC) -E $< $(CFFLAGS) -o $@ -D$(PLATFORM)
+	$(CC) -E $< $(CFLAGS) -o $@ 
 
 %.asm : %.c
-	$(CC) -S $< $(CFFLAGS) -o $@ -D$(PLATFORM)
+	$(CC) -S $< $(CFLAGS) -o $@ 
 
 %.o : %.c
-	$(CC) -MMD -MP -c -o $@ $< $(CFFLAGS) -D$(PLATFORM)
+	$(CC) -MMD -MP -c -o $@ $< $(CFLAGS)
 
  #PHONY protection to not confuse target name with an actual file 
  #so we could use the command  "make compile-all"
 .PHONY: compile-all
-compile-all: all
+compile-all: $(OBJS)
 
  #so we could use the command  "make build"
 .PHONY: build
@@ -103,11 +101,11 @@ all: $(TARGET).out
 
  #link and use code size utility
 $(TARGET).out:$(OBJS)
-	$(CC) -o $@ $^ $(CFFLAGS) $(LDFLAGS) -D$(PLATFORM)
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) 
 	$(CC)-nm -S --defined -s $@
 
  #so we could use the command "make clean" to clean all that files
 .PHONY: clean
 clean:
-	rm *.o *.map *.out *.asm *.i *.d
+	rm -f *.o *.map *.out *.asm *.i *.d
 
