@@ -1,4 +1,6 @@
-# Week-2-Assessment
+# Makefile-Assessment
+
+This is week 2 assignment for "Introduction to Embedded Systems Software and Development Environments" course in coursera.org .
 
 This is a makefile that can compile multiple source files and support two platform targets with thier own specific compiler and flags . 
 
@@ -16,10 +18,19 @@ platform you are compiling for.
 
  Build Targets:
 
-@HOST we use gcc compiler for the host and ansi c99 standard
+	<file.i>
 
-@The host embedded system (MSP432) we use arm-none-eabi-gcc compiler for it and ansi c99 std , target cpu is cortex-m4
-and it's archeticture is thumb armv7e-m float-abi=hard  mfpu=fpv4-sp-d16 and it's specs is nosys.specs
+	<file.asm>
+
+	<file.o>
+
+	<file.out>
+
+	all   ---> compiles and links object file and gerenates the executable
+
+	compile-all  --->compiles and gerenates object files without linking
+
+	clean ---> removes all generated files	
 
 Platform Overrides:
 
