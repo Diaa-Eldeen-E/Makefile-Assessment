@@ -1,6 +1,6 @@
 # Week-2-Assessment
 
-#This is a makefile that can compile multiple source files and support two platform targets with thier own specific compiler and flags . 
+This is a makefile that can compile multiple source files and support two platform targets with thier own specific compiler and flags . 
 
 These two platforms are the HOST and the MSP432. 
 
@@ -23,7 +23,7 @@ and it's archeticture is thumb armv7e-m float-abi=hard  mfpu=fpv4-sp-d16 and it'
 
 Platform Overrides:
 
-@The HOST machine
+@The HOST machine is the default platform
 
 @The HOST embedded system MSP432
 
