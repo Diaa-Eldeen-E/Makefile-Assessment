@@ -1,7 +1,5 @@
 # Makefile-Assessment
 
-This is week 2 assignment for "Introduction to Embedded Systems Software and Development Environments" course in coursera.org .
-
 This is a makefile that can compile multiple source files and support two platform targets with thier own specific compiler and flags . 
 
 These two platforms are the HOST and the MSP432. 
